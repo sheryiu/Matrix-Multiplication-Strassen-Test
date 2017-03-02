@@ -3,23 +3,30 @@ import java.util.Random;
 public class Strassen {
 
 	public static void main(String[] args) {
-		int size = 512;
+		test(256);
+		test(512);
+		test(1024);
+	}
+	
+	public static void test(int size) {
+		long time = System.currentTimeMillis();
 		Matrix a = genRandomMatrix(size);
 		//a.print();
-		System.out.println();
+		//System.out.println();
 		Matrix b = genRandomMatrix(size);
 		//b.print();
-		System.out.println();
-		long time = System.currentTimeMillis();
+		//System.out.println();
+		System.out.printf("Time for generating two %dx%d matrices: %d\n\n", size, size, System.currentTimeMillis()-time);
+		time = System.currentTimeMillis();
 		Matrix.multiplication(a, b);
 		System.out.printf("Time for normal: %d\n\n", System.currentTimeMillis()-time);
 		time = System.currentTimeMillis();
 		strassenMultiplication(size, a, b);
-		System.out.printf("Time for strassen: %d\n\n", System.currentTimeMillis()-time);
+		System.out.printf("Time for strassen: %d\n\n\n", System.currentTimeMillis()-time);
 	}
 	
 	public static Matrix strassenMultiplication(int size, Matrix a, Matrix b) {
-		if (size == 4) {
+		if (size == 128) {
 			return Matrix.multiplication(a, b);
 		} else {
 			Matrix[] m = prepareCommonProcedures(size, a.doubleBisection(), b.doubleBisection());
