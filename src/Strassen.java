@@ -1,26 +1,33 @@
 import java.util.Random;
 
 public class Strassen {
+	
+	private static int strassenStop;
 
 	public static void main(String[] args) {
-		test(256, 8);
-		test(512, 8);
-		test(1024, 8);
-		test(256, 16);
-		test(512, 16);
-		test(1024, 16);
-		test(256, 32);
-		test(512, 32);
-		test(1024, 32);
-		test(256, 64);
-		test(512, 64);
-		test(1024, 64);
-		test(256, 128);
-		test(512, 128);
-		test(1024, 128);
+		strassenStop = 8;
+		test(256);
+		test(512);
+		test(1024);
+		strassenStop = 16;
+		test(256);
+		test(512);
+		test(1024);
+		strassenStop = 32;
+		test(256);
+		test(512);
+		test(1024);
+		strassenStop = 64;
+		test(256);
+		test(512);
+		test(1024);
+		strassenStop = 128;
+		test(256);
+		test(512);
+		test(1024);
 	}
 	
-	public static void test(int size, int strassenStop) {
+	public static void test(int size) {
 		long time = System.currentTimeMillis();
 		Matrix a = genRandomMatrix(size);
 		//a.print();
@@ -29,19 +36,21 @@ public class Strassen {
 		//b.print();
 		//System.out.println();
 		System.out.printf("Time for generating two %dx%d matrices: %d\n", size, size, System.currentTimeMillis()-time);
+		
 		time = System.currentTimeMillis();
 		Matrix.multiplication(a, b);
 		System.out.printf("Time for normal: %d\n", System.currentTimeMillis()-time);
+		
 		time = System.currentTimeMillis();
-		strassenMultiplication(size, strassenStop, a, b);
+		strassenMultiplication(size, a, b);
 		System.out.printf("Time for strassen (stop at %dx%d): %d\n--------------------------\n", strassenStop, strassenStop, System.currentTimeMillis()-time);
 	}
 	
-	public static Matrix strassenMultiplication(int size, int strassenStop, Matrix a, Matrix b) {
+	public static Matrix strassenMultiplication(int size, Matrix a, Matrix b) {
 		if (size == strassenStop) {
 			return Matrix.multiplication(a, b);
 		} else {
-			Matrix[] m = prepareCommonProcedures(size, strassenStop, a.doubleBisection(), b.doubleBisection());
+			Matrix[] m = prepareCommonProcedures(size, a.doubleBisection(), b.doubleBisection());
 			Matrix[] c = new Matrix[4];
 			c[0] = asa(m[0], m[3], m[4], m[6]);
 			c[1] = Matrix.addition(m[2], m[4]);
@@ -51,15 +60,15 @@ public class Strassen {
 		}
 	}
 	
-	public static Matrix[] prepareCommonProcedures(int size, int strassenStop, Matrix[] a, Matrix[] b) {
+	public static Matrix[] prepareCommonProcedures(int size, Matrix[] a, Matrix[] b) {
 		Matrix[] m = new Matrix[7];
-		m[0] = strassenMultiplication(size/2, strassenStop, Matrix.addition(a[0], a[3]), Matrix.addition(b[0], b[3]));
-		m[1] = strassenMultiplication(size/2, strassenStop, Matrix.addition(a[2], a[3]), b[0]);
-		m[2] = strassenMultiplication(size/2, strassenStop, a[0], Matrix.subtraction(b[1], b[3]));
-		m[3] = strassenMultiplication(size/2, strassenStop, a[3], Matrix.subtraction(b[2], b[0]));
-		m[4] = strassenMultiplication(size/2, strassenStop, Matrix.addition(a[0], a[1]), b[3]);
-		m[5] = strassenMultiplication(size/2, strassenStop, Matrix.subtraction(a[2], a[0]), Matrix.addition(b[0], b[1]));
-		m[6] = strassenMultiplication(size/2, strassenStop, Matrix.subtraction(a[1], a[3]), Matrix.addition(b[2], b[3]));
+		m[0] = strassenMultiplication(size/2, Matrix.addition(a[0], a[3]), Matrix.addition(b[0], b[3]));
+		m[1] = strassenMultiplication(size/2, Matrix.addition(a[2], a[3]), b[0]);
+		m[2] = strassenMultiplication(size/2, a[0], Matrix.subtraction(b[1], b[3]));
+		m[3] = strassenMultiplication(size/2, a[3], Matrix.subtraction(b[2], b[0]));
+		m[4] = strassenMultiplication(size/2, Matrix.addition(a[0], a[1]), b[3]);
+		m[5] = strassenMultiplication(size/2, Matrix.subtraction(a[2], a[0]), Matrix.addition(b[0], b[1]));
+		m[6] = strassenMultiplication(size/2, Matrix.subtraction(a[1], a[3]), Matrix.addition(b[2], b[3]));
 		return m;
 	}
 	
