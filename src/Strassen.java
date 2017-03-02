@@ -24,10 +24,10 @@ public class Strassen {
 		} else {
 			Matrix[] m = prepareCommonProcedures(size, a.doubleBisection(), b.doubleBisection());
 			Matrix[] c = new Matrix[4];
-			c[0] = Matrix.addition(Matrix.subtraction(Matrix.addition(m[0], m[3]), m[4]), m[6]);
+			c[0] = asa(m[0], m[3], m[4], m[6]);
 			c[1] = Matrix.addition(m[2], m[4]);
 			c[2] = Matrix.addition(m[1], m[3]);
-			c[3] = Matrix.addition(Matrix.addition(Matrix.subtraction(m[0], m[1]), m[2]), m[5]);
+			c[3] = ssa(m[0], m[1], m[2], m[5]);
 			return Matrix.mergeBisection(size, c);
 		}
 	}
@@ -43,6 +43,29 @@ public class Strassen {
 		m[6] = strassenMultiplication(size/2, Matrix.subtraction(a[1], a[3]), Matrix.addition(b[2], b[3]));
 		return m;
 	}
+	
+	public static Matrix asa(Matrix a, Matrix b, Matrix c, Matrix d) {
+		int[][] temp = new int[a.size][a.size];
+		for (int i=0; i<a.size; i++) {
+			for (int j=0; j<a.size; j++) {
+				temp[i][j] = a.data[i][j]+b.data[i][j]-c.data[i][j]+d.data[i][j];
+			}
+		}
+		return new Matrix(a.size, temp);
+	}
+	
+	public static Matrix ssa(Matrix a, Matrix b, Matrix c, Matrix d) {
+		int[][] temp = new int[a.size][a.size];
+		for (int i=0; i<a.size; i++) {
+			for (int j=0; j<a.size; j++) {
+				temp[i][j] = a.data[i][j]-b.data[i][j]+c.data[i][j]+d.data[i][j];
+			}
+		}
+		return new Matrix(a.size, temp);
+	}
+	
+	
+	
 	
 	public static Matrix genRandomMatrix(int size) {
 		int[][] temp = new int[size][size];
