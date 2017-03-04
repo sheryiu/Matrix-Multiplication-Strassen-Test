@@ -14,10 +14,6 @@ public class Matrix {
 		data = matrix;
 	}
 	
-	public void setEntry(int value, int i, int j) {
-		data[i][j] = value;
-	}
-	
 	public Matrix[] doubleBisection() {
 		if (size >= 2) {
 			int[][][] temp = new int[4][size/2][size/2];
