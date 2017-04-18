@@ -1,75 +1,73 @@
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
+import java.util.Scanner;
 
 public class Strassen {
 	
 	private static int strassenStop;
-	
-	private static Map<Integer, Long[][]> timeTotal;
+	private static int rounds = 1;
 
 	public static void main(String[] args) {
-		timeTotal = new HashMap<>();
-		strassenStop = 8;
-		test(128);
-		test(256);
-		test(512);
-		test(1024);
-		strassenStop = 16;
-		test(128);
-		test(256);
-		test(512);
-		test(1024);
-		strassenStop = 32;
-		test(128);
-		test(256);
-		test(512);
-		test(1024);
-		strassenStop = 64;
-		test(128);
-		test(256);
-		test(512);
-		test(1024);
-		strassenStop = 128;
-		test(256);
-		test(512);
-		test(1024);
-		for (int i=128; i<=1024; i=i*2) {
-			for (int strassen=8; (i>=256&&strassen<=128)||(i==128&&strassen<=64); strassen*=2) {
-				System.out.printf("\"%d %d normal\", ", i, strassen);
-				Long[][] temp = timeTotal.get(i*1000+strassen);
-				for (int j=0; j<temp[0].length; j++) {
-					System.out.printf("%d, ", temp[0][j]);
-				}
-				System.out.println();
-				System.out.printf("\"%d %d strassen\", ", i, strassen);
-				for (int j=0; j<temp[1].length; j++) {
-					System.out.printf("%d, ", temp[1][j]);
-				}
-				System.out.println();
-			}
+		Scanner s = new Scanner(System.in);
+		int mSize = 0;
+		while (mSize <= 0) {
+			System.out.printf("Please input your matrix size:\n");
+			mSize = s.nextInt();
 		}
+		while (strassenStop <= 0 || (Math.log(strassenStop)/Math.log(2)) % 1 != 0 || strassenStop > mSize) {
+			System.out.printf("Please input your Strassen critical size:\n");
+			strassenStop = s.nextInt();
+		}
+		test(mSize, true);
 		
+		s.close();
 	}
 	
 	public static void test(int size) {
-		Long[][] temp = new Long[2][5];
-		for (int i=0; i<5; i++) {
+		test(size, false);
+	}
+	
+	public static void test(int size, boolean print) {
+		Long[][] temp = new Long[2][rounds];
+		for (int i=0; i<rounds; i++) {
+			System.out.printf("Matrix size: %d\n", size);
 			long time = System.currentTimeMillis();
 			Matrix a = genRandomMatrix(size);
 			Matrix b = genRandomMatrix(size);
 			
-			time = System.currentTimeMillis();
-			Matrix.multiplication(a, b);
-			temp[0][i] = System.currentTimeMillis()-time;
-			//System.out.printf("Time for normal: %d\n", System.currentTimeMillis()-time);
+			if ((Math.log(size)/Math.log(2)) % 1 != 0) {
+				size = (int) Math.pow(2, Math.ceil(Math.log(size)/Math.log(2)));
+				a = Matrix.fillZero(a);
+				b = Matrix.fillZero(b);
+			}
 			
 			time = System.currentTimeMillis();
-			strassenMultiplication(size, a, b);
+			if (print)
+				Matrix.multiplication(a, b).print();
+			else
+				Matrix.multiplication(a, b);
+			temp[0][i] = System.currentTimeMillis()-time;
+			if (print)
+				System.out.printf("Time for trivial: %d\n", temp[0][i]);
+			
+			time = System.currentTimeMillis();
+			if (print)
+				strassenMultiplication(size, a, b).print();
+			else
+				strassenMultiplication(size, a, b);
 			temp[1][i] = System.currentTimeMillis()-time;
-			//System.out.printf("Time for strassen (stop at %dx%d): %d\n--------------------------\n", strassenStop, strassenStop, System.currentTimeMillis()-time);
+			if (print)
+				System.out.printf("Time for strassen (stop at %dx%d): %d\n--------------------------\n", strassenStop, strassenStop, temp[1][i]);
 		}
-		timeTotal.put(size*1000+strassenStop, temp);
+		
+		System.out.printf("%d %d normal, ", size, strassenStop);
+		for (int j=0; j<rounds; j++) {
+			System.out.printf("%d, ", temp[0][j]);
+		}
+		System.out.printf("%d %d strassen, ", size, strassenStop);
+		for (int j=0; j<rounds; j++) {
+			System.out.printf("%d, ", temp[1][j]);
+		}
+		System.out.println();
 	}
 	
 	public static Matrix strassenMultiplication(int size, Matrix a, Matrix b) {
@@ -126,7 +124,7 @@ public class Strassen {
 		Random ran = new Random();
 		for (int i=0; i<size; i++) {
 			for (int j=0; j<size; j++) {
-				temp[i][j] = ran.nextInt(1000);
+				temp[i][j] = ran.nextInt(100);
 			}
 		}
 		return new Matrix(size, temp);

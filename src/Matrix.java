@@ -45,7 +45,7 @@ public class Matrix {
 		// j is columns
 		for (int i=0; i<size; i++) {
 			for (int j=0; j<size; j++) {
-				System.out.printf("%4d ", data[i][j]);
+				System.out.printf("%8d ", data[i][j]);
 			}
 			System.out.println();
 		}
@@ -103,5 +103,19 @@ public class Matrix {
 			}
 		}
 		return new Matrix(size, temp);
+	}
+	
+	public static Matrix fillZero(Matrix a) {
+		int newSize = (int) Math.pow(2, Math.ceil(Math.log(a.size)/Math.log(2)));
+		int[][] temp = new int[newSize][newSize];
+		for (int i=0; i<newSize; i++) {
+			for (int j=0; j<newSize; j++) {
+				if (i < a.size && j < a.size)
+					temp[i][j] = a.data[i][j];
+				else
+					temp[i][j] = 0;
+			}
+		}
+		return new Matrix(newSize, temp);
 	}
 }
